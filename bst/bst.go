@@ -103,7 +103,7 @@ func (b *BST) delete(key Key) error {
 	return nil
 }
 
-// deleteFromNode 从树 x 上移除指定的 key。返回新的树。
+// deleteFromNode 删除节点 key 并返回新树
 func (b *BST) deleteFromNode(x *Node, key Key) *Node {
 	if x == nil {
 		return nil
@@ -111,20 +111,27 @@ func (b *BST) deleteFromNode(x *Node, key Key) *Node {
 	cmp := key.compareTo(x.key)
 	// 左子树或者右子树和直接后继对换后删除原节点
 	if cmp < 0 {
+		// 在左子树上删除
 		x.left = b.deleteFromNode(x.left, key)
 	} else if cmp > 0 {
+		// 在右子树上删除
 		x.right = b.deleteFromNode(x.right, key)
 	} else {
-		// 直接移除该节点
+		// 如果右子树为空，该节点用左孩子替代，相当于直接移除了
 		if x.right == nil {
 			return x.left
 		}
+		// 如果左子树为空，该节点用右孩子替代，相当于直接移除了
 		if x.left == nil {
 			return x.right
 		}
+		// 如果左右子树都非空
 		t := x
+		// 找直接后继，用它替代
 		x = min(t.right)
+		// 移除直接后继
 		x.right = deleteMinNode(t.right)
+		// 左子树不变
 		x.left = t.left
 	}
 	x.size = size(x.left) + size(x.right) + 1
@@ -166,11 +173,14 @@ func (b *BST) deleteMin() error {
 	return nil
 }
 
+// deleteMinNode 移除直接后继，返回新节点
 func deleteMinNode(x *Node) *Node {
+	// 如果已经到最左，将该节点用右子树代替，相当于删除
 	if x.left == nil {
 		return x.right
 	}
 	x.left = deleteMinNode(x.left)
+	// 更新大小
 	x.size = size(x.left) + size(x.right) + 1
 	return x
 }
