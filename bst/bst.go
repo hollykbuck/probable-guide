@@ -218,3 +218,24 @@ func max(x *Node) *Node {
 		return max(x.right)
 	}
 }
+
+func (b *BST) selectRank(rank int) (Key, error) {
+	if rank < 0 || rank >= b.size() {
+		return nil, ErrInvalidArgument
+	}
+	return selectRankFromNode(b.root, rank), nil
+}
+
+func selectRankFromNode(x *Node, rank int) Key {
+	if x == nil {
+		return nil
+	}
+	leftSize := size(x.left)
+	if leftSize > rank {
+		return selectRankFromNode(x.left, rank)
+	} else if leftSize < rank {
+		return selectRankFromNode(x.right, rank-leftSize-1)
+	} else {
+		return x.key
+	}
+}
