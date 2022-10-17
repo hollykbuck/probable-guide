@@ -63,10 +63,10 @@ func (b *BST) contains(key Key) (bool, error) {
 }
 
 func (b *BST) get(key Key) (interface{}, error) {
-	return b.getFromNode(b.root, key)
+	return getFromNode(b.root, key)
 }
 
-func (b *BST) getFromNode(x *Node, key Key) (interface{}, error) {
+func getFromNode(x *Node, key Key) (interface{}, error) {
 	if key == nil {
 		return nil, ErrInvalidArgument
 	}
@@ -75,9 +75,9 @@ func (b *BST) getFromNode(x *Node, key Key) (interface{}, error) {
 	}
 	to := key.compareTo(x.key)
 	if to < 0 {
-		return b.getFromNode(x.left, key)
+		return getFromNode(x.left, key)
 	} else if to > 0 {
-		return b.getFromNode(x.right, key)
+		return getFromNode(x.right, key)
 	} else {
 		return x.val, nil
 	}
@@ -90,7 +90,7 @@ func (b *BST) put(key Key, val interface{}) error {
 	if val == nil {
 		return b.delete(key)
 	}
-	b.root = b.putToNode(b.root, key, val)
+	b.root = putToNode(b.root, key, val)
 	return nil
 }
 
@@ -99,12 +99,12 @@ func (b *BST) delete(key Key) error {
 	if key == nil {
 		return fmt.Errorf("key == nil: %w", ErrInvalidArgument)
 	}
-	b.root = b.deleteFromNode(b.root, key)
+	b.root = deleteFromNode(b.root, key)
 	return nil
 }
 
 // deleteFromNode 删除节点 key 并返回新树
-func (b *BST) deleteFromNode(x *Node, key Key) *Node {
+func deleteFromNode(x *Node, key Key) *Node {
 	if x == nil {
 		return nil
 	}
@@ -112,10 +112,10 @@ func (b *BST) deleteFromNode(x *Node, key Key) *Node {
 	// 左子树或者右子树和直接后继对换后删除原节点
 	if cmp < 0 {
 		// 在左子树上删除
-		x.left = b.deleteFromNode(x.left, key)
+		x.left = deleteFromNode(x.left, key)
 	} else if cmp > 0 {
 		// 在右子树上删除
-		x.right = b.deleteFromNode(x.right, key)
+		x.right = deleteFromNode(x.right, key)
 	} else {
 		// 如果右子树为空，该节点用左孩子替代，相当于直接移除了
 		if x.right == nil {
@@ -138,7 +138,7 @@ func (b *BST) deleteFromNode(x *Node, key Key) *Node {
 	return x
 }
 
-func (b *BST) putToNode(x *Node, key Key, val interface{}) *Node {
+func putToNode(x *Node, key Key, val interface{}) *Node {
 	if x == nil {
 		return &Node{
 			key:  key,
@@ -148,9 +148,9 @@ func (b *BST) putToNode(x *Node, key Key, val interface{}) *Node {
 	}
 	cmp := key.compareTo(x.key)
 	if cmp < 0 {
-		x.left = b.putToNode(x.left, key, val)
+		x.left = putToNode(x.left, key, val)
 	} else if cmp > 0 {
-		x.right = b.putToNode(x.right, key, val)
+		x.right = putToNode(x.right, key, val)
 	} else {
 		x.size = 1 + size(x.left) + size(x.right)
 	}
@@ -183,4 +183,38 @@ func deleteMinNode(x *Node) *Node {
 	// 更新大小
 	x.size = size(x.left) + size(x.right) + 1
 	return x
+}
+
+func (b *BST) deleteMax() error {
+	if b.isEmpty() {
+		return ErrNoSuchElement
+	}
+	deleteMaxNode(b.root)
+	return nil
+}
+
+func deleteMaxNode(x *Node) *Node {
+	if x.right == nil {
+		return x.left
+	}
+	x.right = deleteMaxNode(x.right)
+	x.size = size(x.left) + size(x.right) + 1
+	return x
+}
+
+// max 从根节点出发找最大值
+func (b *BST) max() (Key, error) {
+	if b.isEmpty() {
+		return nil, ErrNoSuchElement
+	}
+	return max(b.root).key, nil
+}
+
+// max 递归在右子树中找最大值
+func max(x *Node) *Node {
+	if x.right == nil {
+		return x
+	} else {
+		return max(x.right)
+	}
 }
