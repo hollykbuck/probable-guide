@@ -19,6 +19,7 @@ type Key interface {
 	CompareTo(Key) int
 }
 
+// Node BST树最淳朴
 type Node struct {
 	key   Key
 	val   interface{}
