@@ -16,7 +16,7 @@ func (b *ErrorBST) Error() string {
 }
 
 type Key interface {
-	compareTo(Key) int
+	CompareTo(Key) int
 }
 
 type Node struct {
@@ -73,7 +73,7 @@ func getFromNode(x *Node, key Key) (interface{}, error) {
 	if x == nil {
 		return nil, ErrInvalidArgument
 	}
-	to := key.compareTo(x.key)
+	to := key.CompareTo(x.key)
 	if to < 0 {
 		return getFromNode(x.left, key)
 	} else if to > 0 {
@@ -108,7 +108,7 @@ func deleteFromNode(x *Node, key Key) *Node {
 	if x == nil {
 		return nil
 	}
-	cmp := key.compareTo(x.key)
+	cmp := key.CompareTo(x.key)
 	// 左子树或者右子树和直接后继对换后删除原节点
 	if cmp < 0 {
 		// 在左子树上删除
@@ -146,7 +146,7 @@ func putToNode(x *Node, key Key, val interface{}) *Node {
 			size: 1,
 		}
 	}
-	cmp := key.compareTo(x.key)
+	cmp := key.CompareTo(x.key)
 	if cmp < 0 {
 		x.left = putToNode(x.left, key, val)
 	} else if cmp > 0 {
